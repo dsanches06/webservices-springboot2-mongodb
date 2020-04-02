@@ -25,15 +25,19 @@ public class PostService {
 		return obj.orElseThrow(() -> new ObjectNotFoundException("Object not found"));
 	}
 
+	public List<Post> findByTitle(String text) {
+		return repository.findByTitleContainingIgnoreCase(text);
+	}
+
 	public Post insert(Post obj) {
 		return repository.insert(obj);
 	}
-	
+
 	public void delete(String id) {
 		findById(id);
 		repository.deleteById(id);
 	}
-	
+
 	public Post update(Post obj) {
 		Post newObj = findById(obj.getId());
 		updateData(newObj, obj);
@@ -42,10 +46,10 @@ public class PostService {
 
 	private void updateData(Post newObj, Post obj) {
 		newObj.setTitle(obj.getTitle());
-		newObj.setDate(obj.getDate());	
-		newObj.setTitle(obj.getTitle());	
-		newObj.setBody(obj.getBody());	
-		newObj.setAuthor(obj.getAuthor());	
+		newObj.setDate(obj.getDate());
+		newObj.setTitle(obj.getTitle());
+		newObj.setBody(obj.getBody());
+		newObj.setAuthor(obj.getAuthor());
 	}
 
 	public Post fromDTO(Post post) {
