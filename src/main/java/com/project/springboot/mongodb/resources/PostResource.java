@@ -2,7 +2,6 @@ package com.project.springboot.mongodb.resources;
 
 import java.net.URI;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -13,33 +12,32 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.project.springboot.mongodb.domain.User;
-import com.project.springboot.mongodb.dto.UserDTO;
-import com.project.springboot.mongodb.services.UserService;
+import com.project.springboot.mongodb.domain.Post;
+import com.project.springboot.mongodb.dto.AuthorDTO;
+import com.project.springboot.mongodb.services.PostService;
 
 @RestController
-@RequestMapping(value = "/users")
-public class UserResource {
+@RequestMapping(value = "/posts")
+public class PostResource {
 
 	@Autowired
-	private UserService service;
+	private PostService service;
 
 	@RequestMapping(method = RequestMethod.GET)
-	public ResponseEntity<List<UserDTO>> findAll() {
-		List<User> list = service.findAll();
-		List<UserDTO> listDTO = list.stream().map(x -> new UserDTO(x)).collect(Collectors.toList());
-		return ResponseEntity.ok().body(listDTO);
+	public ResponseEntity<List<Post>> findAll() {
+		List<Post> list = service.findAll();
+		return ResponseEntity.ok().body(list);
 	}
 
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
-	public ResponseEntity<UserDTO> findById(@PathVariable String id) {
-		User obj = service.findById(id);
-		return ResponseEntity.ok().body(new UserDTO(obj));
+	public ResponseEntity<Post> findById(@PathVariable String id) {
+		Post obj = service.findById(id);
+		return ResponseEntity.ok().body(obj);
 	}
 
 	@RequestMapping(method = RequestMethod.POST)
-	public ResponseEntity<Void> insert(@RequestBody UserDTO userDTO) {
-		User obj = service.fromDTO(userDTO);
+	public ResponseEntity<Void> insert(@RequestBody Post post) {
+		Post obj = service.fromDTO(post);
 		obj = service.insert(obj);
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(obj.getId()).toUri();
 		return ResponseEntity.created(uri).build();
@@ -52,10 +50,17 @@ public class UserResource {
 	}
 
 	@RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-	public ResponseEntity<Void> update(@RequestBody UserDTO userDTO, @PathVariable String id) {
-		User obj = service.fromDTO(userDTO);
+	public ResponseEntity<Void> update(@RequestBody Post postDTO, @PathVariable String id) {
+		Post obj = service.fromDTO(postDTO);
 		obj.setId(id);
 		obj = service.update(obj);
 		return ResponseEntity.noContent().build();
 	}
+
+	@RequestMapping(value = "/{id}/author", method = RequestMethod.GET)
+	public ResponseEntity<AuthorDTO> findAuthor(@PathVariable String id) {
+		Post obj = service.findById(id);
+		return ResponseEntity.ok().body(obj.getAuthor());
+	}
+
 }
