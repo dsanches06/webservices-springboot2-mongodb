@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
 import com.project.springboot.mongodb.domain.Post;
 import com.project.springboot.mongodb.domain.User;
 import com.project.springboot.mongodb.dto.AuthorDTO;
+import com.project.springboot.mongodb.dto.CommentDTO;
 import com.project.springboot.mongodb.repository.PostRepository;
 import com.project.springboot.mongodb.repository.UserRepository;
 
@@ -39,16 +40,26 @@ public class Instantiation implements CommandLineRunner {
 		User bob = new User(null, "Bob Grey", "bob@gmail.com");
 		// inserir no mongodb
 		userRepository.saveAll(Arrays.asList(maria, alex, bob));
-		
+
 		// criar post
 		Post post1 = new Post(null, sdf.parse("21/03/2018"), "Partiu viagem", "Vou viajar para São Paulo. Abraços!", new AuthorDTO(maria));
 		Post post2 = new Post(null, sdf.parse("23/03/2018"), "Bom dia", "Acordei feliz hoje!", new AuthorDTO(maria));
+
+		// criar comentario
+		CommentDTO c1 = new CommentDTO("Boa viagem mano.", sdf.parse("21/03/2018"), new AuthorDTO(alex));
+		CommentDTO c2 = new CommentDTO("Aproveite!", sdf.parse("22/03/2018"), new AuthorDTO(bob));
+		CommentDTO c3 = new CommentDTO("Tenha um ótimo dia!", sdf.parse("23/03/2018"), new AuthorDTO(alex));
+
+		// associar comentario ao post
+		post1.getComments().addAll(Arrays.asList(c1, c2));
+		post2.getComments().addAll(Arrays.asList(c3));
+
 		// inserir no mongodb
 		postRepository.saveAll(Arrays.asList(post1, post2));
-		
-		//associar post ao user
+
+		// associar post ao user
 		maria.getPosts().addAll(Arrays.asList(post1, post2));
-		//salvar outra vez no mongodb
+		// salvar outra vez no mongodb
 		userRepository.save(maria);
 	}
 }
